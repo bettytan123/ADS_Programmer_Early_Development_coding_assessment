@@ -44,7 +44,8 @@ names(ds_truth)
 #1.3 Read in CT
 study_ct <- read_csv("sdtm_ct.csv")
 
-
+#1.4 load DM for build DSSTDTC
+dm<-pharmaversesdtm::dm
 #--------------------------------------------------
 # 2. Add oak ID vars and prepare raw data
 #--------------------------------------------------
@@ -73,10 +74,25 @@ ds_raw_oak <- ds_raw %>%
 
 
 #--------------------------------------------------
-# 3. build DS with identifiers using sdtm.oak
+# 3. build DS with identifiers using sdtm.oak (3.1-3.10)
 #--------------------------------------------------
+
+# KEY function clarification :
+# assign_no_ct() maps raw variables that do not need controlled terminology. 
+# assign_ct() maps raw values through the study CT file into a standardized SDTM value. 
+# assign_datetime() parses raw date and time pieces into ISO 8601 character values. 
+
+# Workflow:
+# Part 1: no CT variables
+# Part 2:date time variables
+# Part 3:different logic variables
+# Part 4:Derive variables
+# Part 5:Require Sort then derive variables
+# Part 6:Require other source then derive variables
+
 # ---------------
-# no CT variables: using assign_no_ct,hardcode_no_ct
+# Part 1: no CT variables: 
+# using assign_no_ct,hardcode_no_ct
 # ---------------
 #3.1 STUDYID
 ds <- assign_no_ct(
@@ -115,7 +131,7 @@ ds <- assign_no_ct(
 )
 
 # ---------------
-# date time variables: using assign_datetime
+# Part 2:date time variables: using assign_datetime
 # ---------------
 #3.5 DSDTC: come from DSDTCOL and DSTMCO 
 ds <- assign_datetime(
@@ -141,7 +157,7 @@ ds <- assign_datetime(
 )
 
 # ---------------
-# different logic variables: transmute() + left_join()
+# Part 3:different logic variables: transmute() + left_join()
 # ---------------
 #3.7 DSTERM, DSDECOD, DSCAT using required logic in CRF
 ds_logic <- ds_raw_oak %>%
@@ -172,19 +188,101 @@ ds <- ds %>%
 
 
 # ---------------
-# Derive variables: using assign_ct()
+# Part 4:Derive variables: using assign_ct()
 # ---------------
-#3.8 VISIT and VISITNUM using assign_ct()
+#3.8 VISIT and VISITNUM 
+ds <- assign_ct(
+  raw_dat = ds_raw_oak,
+  raw_var = "VISIT_RAW",
+  tgt_dat = ds,
+  tgt_var = "VISIT",
+  ct_spec = study_ct,
+  ct_clst = "VISIT",
+  id_vars = oak_id_vars()
+)
+
+ds <- assign_ct(
+  raw_dat = ds_raw_oak,
+  raw_var = "VISIT_RAW",
+  tgt_dat = ds,
+  tgt_var = "VISITNUM",
+  ct_spec = study_ct,
+  ct_clst = "VISITNUM",
+  id_vars = oak_id_vars()
+) %>%
+  # handle terms could not be mapped per the controlled terminology
+  mutate(
+    VISITNUM = str_extract(VISITNUM, "\\d+\\.?\\d*") #extracts numeric part
+  )
+
+# ---------------
+# Part 5:Require Sort then derive variables
+# ---------------
+#3.9 DSSEQ : last step to derive require sort first
+
+ds <- ds %>%
+  arrange(USUBJID, DSSTDTC, VISITNUM, DSDTC, DSTERM, DSDECOD)
+
+ds <- derive_seq(
+  tgt_dat = ds,
+  tgt_var = "DSSEQ",
+  rec_vars = c("STUDYID", "USUBJID", "DSSTDTC", "VISITNUM", "DSTERM", "DSDECOD")
+)
+
+# ---------------
+# Part 6:Require other source then derive variables
+#----------------
+#3.10 DSSTDY : using subject reference start date in DM, usually RFSTDTC
+
+ds <- derive_study_day(
+  sdtm_in = ds,
+  dm_domain = dm,
+  tgdt = "DSSTDTC",
+  refdt = "RFSTDTC",
+  study_day_var = "DSSTDY",
+  merge_key = "USUBJID"
+)
+
+#--------------------------------------------------
+# 4. Final DS domain
+#--------------------------------------------------
+#only keep final result
+ds_final <- ds %>%
+  select(
+    STUDYID,
+    DOMAIN,
+    USUBJID,
+    DSSEQ,
+    DSTERM,
+    DSDECOD,
+    DSCAT,
+    VISITNUM,
+    VISIT,
+    DSDTC,
+    DSSTDTC,
+    DSSTDY
+  ) %>%
+  arrange(USUBJID, DSSEQ)
 
 
 
-# LAST ON DSSTDY is then derived against the subject reference start date from DM. 
-# LAST ON DSSEQ is not magic; it is determined by your chosen ordering keys. A defensible self-written approach is to derive all content variables first, sort records in a stable subject-level order, and then call derive_seq()
+#--------------------------------------------------
+# 5. QC Checks
+#--------------------------------------------------
+names(ds_final)
+head(ds_final, 20)
 
-#assign_no_ct() maps raw variables that do not need controlled terminology. 
-# assign_ct() maps raw values through the study CT file into a standardized SDTM value. 
-# assign_datetime() parses raw date and time pieces into ISO 8601 character values. 
-# derive_seq() creates DSSEQ, and derive_study_day() calculates DSSTDY from the DS event date relative to the subject reference date in DM. 
+table(ds_final$DSCAT, useNA = "ifany")
+table(ds_truth$DSCAT, useNA = "ifany")
+#sth wrong debuggg
+table(ds_final$VISIT, ds_final$VISITNUM, useNA = "ifany")
+table(ds_truth$VISIT, ds_final$VISITNUM, useNA = "ifany")
+
+table(ds_final$DSDECOD, useNA = "ifany")
+table(ds_truth$DSDECOD, useNA = "ifany")
+table(ds$DSSTDY==ds_truth$DSSTDY,useNA = 'ifany')
+# TRUE <NA> 
+#   798   52 
 
 
 
