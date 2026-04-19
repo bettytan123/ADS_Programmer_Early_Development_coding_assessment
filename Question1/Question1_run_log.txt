@@ -1,0 +1,20 @@
+Run started: 2026-04-19 11:13:01.021808 
+indexing sdtm_ct.csv [===================================] 511.93MB/s, eta:  0s                                                                               Check final dataset
+Rows: 850 
+Columns: 12 
+Column names:
+ [1] "STUDYID"  "DOMAIN"   "USUBJID"  "DSSEQ"    "DSTERM"   "DSDECOD" 
+ [7] "DSCAT"    "VISITNUM" "VISIT"    "DSDTC"    "DSSTDTC"  "DSSTDY"  
+Preview:
+# A tibble: 6 × 12
+  STUDYID      DOMAIN USUBJID   DSSEQ DSTERM DSDECOD DSCAT VISITNUM VISIT DSDTC
+  <chr>        <chr>  <chr>     <int> <chr>  <chr>   <chr> <chr>    <chr> <iso>
+1 CDISCPILOT01 DS     01-701-1…     1 RANDO… RANDOM… PROT… 3        BASE… 2014…
+2 CDISCPILOT01 DS     01-701-1…     2 PROTO… COMPLE… DISP… 13       WEEK… 2014…
+3 CDISCPILOT01 DS     01-701-1…     3 FINAL… FINAL … OTHE… 13       WEEK… 2014…
+4 CDISCPILOT01 DS     01-701-1…     1 RANDO… RANDOM… PROT… 3        BASE… 2012…
+5 CDISCPILOT01 DS     01-701-1…     2 ADVER… ADVERS… DISP… 5        WEEK… 2012…
+6 CDISCPILOT01 DS     01-701-1…     3 FINAL… FINAL … OTHE… 5        WEEK… 2012…
+# ℹ 2 more variables: DSSTDTC <date>, DSSTDY <int>
+Status: Completed successfully
+Run ended: 2026-04-19 11:13:01.852892 
