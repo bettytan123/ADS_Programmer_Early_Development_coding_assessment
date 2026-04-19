@@ -1,5 +1,5 @@
-Run started: 2026-04-19 12:03:26.101746 
-indexing sdtm_ct.csv [===================================] 573.05MB/s, eta:  0s                                                                               Output dataset saved to: output/ds_final_20260419.csv
+Run started: 2026-04-19 12:10:56.211635 
+indexing sdtm_ct.csv [===================================] 462.59MB/s, eta:  0s                                                                               Output dataset saved to: output/ds_final_20260419.csv
 Number of rows: 850 
 Number of columns: 12 
 Column names:
@@ -17,4 +17,4 @@ Preview of dataset:
 6 CDISCPILOT01 DS     01-701-1…     3 FINAL… FINAL … OTHE… 5        WEEK… 2012…
 # ℹ 2 more variables: DSSTDTC <date>, DSSTDY <int>
 Status: Completed successfully
-Run ended: 2026-04-19 12:03:27.009401 
+Run ended: 2026-04-19 12:10:56.994714 
