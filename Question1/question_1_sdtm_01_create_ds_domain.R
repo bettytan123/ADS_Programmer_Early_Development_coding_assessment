@@ -1,6 +1,6 @@
 #-------------------
 #Question_1
-#Last Updated on 2026-04-18
+#Last Updated on 2026-04-19
 #Updated by Betty Chen
 #-------------------
 #need debug
@@ -42,6 +42,7 @@ names(ds_truth)
 # [11] "DSDTC"    "DSSTDTC"  "DSSTDY"  
 
 #1.3 Read in CT
+setwd("C:/Users/betty chen/Documents/ADS_Programmer_Early_Development_coding_assessment/Question1")
 study_ct <- read_csv("sdtm_ct.csv")
 
 #1.4 load DM for build DSSTDTC
@@ -84,15 +85,15 @@ ds_raw_oak <- ds_raw %>%
 # assign_datetime() parses raw date and time pieces into ISO 8601 character values. 
 
 # Workflow:
-# Part 1: no CT variables
-# Part 2:date time variables
-# Part 3:different logic variables
-# Part 4:Derive variables
-# Part 5:Require Sort then derive variables
-# Part 6:Require other source then derive variables
+# Part_1: no CT variables
+# Part_2:date time variables
+# Part_3:different logic variables
+# Part_4:Derive variables with CT
+# Part_5:Require Sort then derive variables
+# Part_6:Require other source then derive variables
 
 # ---------------
-# Part 1: no CT variables: 
+# Part_1: no CT variables: 
 # using assign_no_ct,hardcode_no_ct
 # ---------------
 #3.1 STUDYID
@@ -132,7 +133,7 @@ ds <- assign_no_ct(
 )
 
 # ---------------
-# Part 2:date time variables: using assign_datetime
+# Part_2:date time variables: using assign_datetime
 # ---------------
 #3.5 DSDTC: come from DSDTCOL and DSTMCO 
 ds <- assign_datetime(
@@ -158,7 +159,7 @@ ds <- assign_datetime(
 )
 
 # ---------------
-# Part 3:different logic variables: transmute() + left_join()
+# Part_3:different logic variables: transmute() + left_join()
 # ---------------
 #3.7 DSTERM, DSDECOD, DSCAT using required logic in CRF
 ds_logic <- ds_raw_oak %>%
@@ -189,7 +190,7 @@ ds <- ds %>%
 
 
 # ---------------
-# Part 4:Derive variables: using assign_ct()
+# Part_4:Derive variables that has CT: using assign_ct()
 # ---------------
 #3.8 VISIT and VISITNUM 
 ds <- assign_ct(
@@ -200,7 +201,8 @@ ds <- assign_ct(
   ct_spec = study_ct,
   ct_clst = "VISIT",
   id_vars = oak_id_vars()
-)
+) %>%
+  mutate(VISIT=str_to_upper(VISIT))
 
 ds <- assign_ct(
   raw_dat = ds_raw_oak,
@@ -211,27 +213,32 @@ ds <- assign_ct(
   ct_clst = "VISITNUM",
   id_vars = oak_id_vars()
 ) %>%
-  # handle terms could not be mapped per the controlled terminology
+  # handle VISITNUM terms could not be mapped by this controlled terminology
   mutate(
     VISITNUM = str_extract(VISITNUM, "\\d+\\.?\\d*") #extracts numeric part
   )
 
 # ---------------
-# Part 5:Require Sort then derive variables
+# Part_5:Require Sort then derive variables
 # ---------------
 #3.9 DSSEQ : last step to derive require sort first
 
 ds <- ds %>%
-  arrange(USUBJID, DSSTDTC, VISITNUM, DSDTC, DSTERM, DSDECOD)
+  arrange(oak_id )%>%
+  mutate(DSTERM = str_to_upper(DSTERM))
+  # arrange(USUBJID, DSSTDTC, VISITNUM, DSDTC, DSTERM, DSDECOD)
 
 ds <- derive_seq(
   tgt_dat = ds,
   tgt_var = "DSSEQ",
-  rec_vars = c("STUDYID", "USUBJID", "DSSTDTC", "VISITNUM", "DSTERM", "DSDECOD")
+  rec_vars = c("STUDYID", "USUBJID")#note: this debug the visit issue (think this as a group by)
 )
-
+temp_grp_ds <- ds %>%
+  group_by(STUDYID, USUBJID) %>%
+  mutate(seq = row_number()) %>%
+  ungroup()
 # ---------------
-# Part 6:Require other source then derive variables
+# Part_6:Require other source then derive variables
 #----------------
 #3.10 DSSTDY : using subject reference start date in DM, usually RFSTDTC
 
@@ -247,7 +254,7 @@ ds <- derive_study_day(
 #--------------------------------------------------
 # 4. Final DS domain
 #--------------------------------------------------
-#only keep final result
+#only keep varibles for final result
 ds_final <- ds %>%
   select(
     STUDYID,
@@ -270,21 +277,47 @@ ds_final <- ds %>%
 #--------------------------------------------------
 # 5. QC Checks
 #--------------------------------------------------
+#check column name
 names(ds_final)
 head(ds_final, 20)
 
+#check category
 table(ds_final$DSCAT, useNA = "ifany")
 table(ds_truth$DSCAT, useNA = "ifany")
-#sth wrong debuggg
+#sth wrong debuggg --> solved in DSSEQ LINE 234
+#SAME--> YEAH!
+
 table(ds_final$VISIT, ds_final$VISITNUM, useNA = "ifany")
 table(ds_truth$VISIT, ds_final$VISITNUM, useNA = "ifany")
+#Now SAME--> YEAH!
+
+# #DEBUG code for ref:
+# ds_final <- ds_final %>%
+#   arrange(STUDYID, DOMAIN, USUBJID, DSSEQ)
+# ds_truth <- ds_truth %>%
+#   arrange(STUDYID, DOMAIN, USUBJID, DSSEQ)
+# ds <- ds %>%
+#   arrange(STUDYID, DOMAIN, USUBJID, DSSEQ, oak_id)
+# 
+# 
+# temp_final <- ds_final %>%
+#   filter(ds_final$VISIT != ds_truth$VISIT)
+# temp_truth <- ds_truth %>%
+#   filter(ds_final$VISIT != ds_truth$VISIT)
+# temp_ds <- ds %>%
+#     filter(ds$VISIT != ds_truth$VISIT)
+# temp_ds_raw <- ds_raw_oak %>%
+#     filter(ds$VISIT != ds_truth$VISIT)
+
 
 table(ds_final$DSDECOD, useNA = "ifany")
 table(ds_truth$DSDECOD, useNA = "ifany")
+#SAME--> YEAH!
+
 table(ds$DSSTDY==ds_truth$DSSTDY,useNA = 'ifany')
 # TRUE <NA> 
 #   798   52 
-
+##SAME--> YEAH!
 
 
 # ---------------------------------------------------------------------------
@@ -292,7 +325,7 @@ table(ds$DSSTDY==ds_truth$DSSTDY,useNA = 'ifany')
 # ---------------------------------------------------------------------------
 write.csv(
   ds_final,
-  file = "ds_final_20260418.csv",
+  file = "ds_final_20260419.csv",
   row.names = FALSE,
   na = ""
 )
