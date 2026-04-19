@@ -3,7 +3,7 @@
 #Last Updated on 2026-04-19
 #Updated by Betty Chen
 #-------------------
-#need debug
+
 # Objective: 
 # Create an SDTM Disposition (DS) domain dataset from raw clinical trial data
 # using the {sdtm.oak}.  
@@ -12,6 +12,22 @@
 # Develop an R program to create the DS domain using
 # STUDYID, DOMAIN, USUBJID, DSSEQ, DSTERM, DSDECOD, DSCAT, VISITNUM, 
 # VISIT, DSDTC, DSSTDTC, DSSTDY
+
+#------------------
+# Prepare to save log later
+#------------------
+# create output folder if it does not exist
+if (!dir.exists("output")) {
+  dir.create("output")
+}
+
+# close any existing sinks
+while (sink.number() > 0) sink()
+
+# start log
+sink("output/Question1_run_log.txt", split = TRUE)
+
+cat("Run started:", as.character(Sys.time()), "\n")
 
 #--------------------------------------------------
 # 1.load library and input data (1.1-1.4)
@@ -325,13 +341,21 @@ table(ds$DSSTDY==ds_truth$DSSTDY,useNA = 'ifany')
 # ---------------------------------------------------------------------------
 write.csv(
   ds_final,
-  file = "ds_final_20260419.csv",
+  file = "output/ds_final_20260419.csv",
   row.names = FALSE,
   na = ""
 )
 
+cat("Output dataset saved to: output/ds_final_20260419.csv\n")
+cat("Number of rows:", nrow(ds), "\n")
+cat("Number of columns:", ncol(ds), "\n")
+cat("Column names:\n")
+print(names(ds))
+cat("Preview of dataset:\n")
+print(head(ds))
 
+cat("Status: Completed successfully\n")
+cat("Run ended:", as.character(Sys.time()), "\n")
 
-
-
-
+# close log
+sink()
