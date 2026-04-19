@@ -1,5 +1,0 @@
-ADSL creation completed successfully.
-Timestamp: 2026-04-19 00:22:28 EDT
-Rows: 306
-Columns: 37
-Required variables present: TRUE
