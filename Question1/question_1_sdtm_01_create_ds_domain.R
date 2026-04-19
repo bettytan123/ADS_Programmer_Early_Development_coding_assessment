@@ -12,7 +12,7 @@
 # Develop an R program to create the DS domain using
 # STUDYID, DOMAIN, USUBJID, DSSEQ, DSTERM, DSDECOD, DSCAT, VISITNUM, 
 # VISIT, DSDTC, DSSTDTC, DSSTDY
-
+setwd("C:/Users/betty chen/Documents/ADS_Programmer_Early_Development_coding_assessment/Question1")
 #------------------
 # Prepare to save log later
 #------------------
@@ -347,12 +347,12 @@ write.csv(
 )
 
 cat("Output dataset saved to: output/ds_final_20260419.csv\n")
-cat("Number of rows:", nrow(ds), "\n")
-cat("Number of columns:", ncol(ds), "\n")
+cat("Number of rows:", nrow(ds_final), "\n")
+cat("Number of columns:", ncol(ds_final), "\n")
 cat("Column names:\n")
-print(names(ds))
+print(names(ds_final))
 cat("Preview of dataset:\n")
-print(head(ds))
+print(head(ds_final))
 
 cat("Status: Completed successfully\n")
 cat("Run ended:", as.character(Sys.time()), "\n")
