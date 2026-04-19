@@ -11,8 +11,26 @@
 # Task: 
 # Develop an R program to create the ADSL using the input SDTM data
 
+setwd("C:/Users/betty chen/Documents/ADS_Programmer_Early_Development_coding_assessment/Question2")
+#------------------
+# Prepare to save log later
+#------------------
+# create output folder if it does not exist
+if (!dir.exists("output")) {
+  dir.create("output")
+}
+
+# close any existing sinks
+while (sink.number() > 0) sink()
+
+# start log
+sink("output/Question2_run_log.txt", split = TRUE)
+
+cat("Run started:", as.character(Sys.time()), "\n")
+
+
 #--------------------------------------------------
-# 1.load library and input data (1.1-1.5)
+# 1.load library and input data (5 files)
 #--------------------------------------------------
 library(metacore)
 library(metatools)
@@ -24,7 +42,7 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 
-# #1.1-1.5 Read in all input SDTM data
+#Read in all input SDTM data
 dm <- pharmaversesdtm::dm
 vs <- pharmaversesdtm::vs
 ex <- pharmaversesdtm::ex
@@ -108,8 +126,9 @@ ex_ext <- ex %>%
 adsl <- adsl %>%
   derive_vars_merged(
     dataset_add = ex_ext,
+    #valid dose definition
     by_vars = exprs(STUDYID, USUBJID),
-    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & str_detect(EXTRT, "PLACEBO"))) & #dose definition
+    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & str_detect(EXTRT, "PLACEBO"))) & 
       !is.na(EXSTDTM),
     new_vars = exprs(TRTSDTM = EXSTDTM, TRTSTMF = EXSTTMF),
     order = exprs(EXSTDTM, EXSEQ),
@@ -130,18 +149,19 @@ adsl <- adsl %>%
 
 # ------------------------
 # 3.4 Derive LSTAVLDT
-
-# -use complete date:
+#Workflow
+# step1: use complete date:
 # - 1)VS: use VSDTC date if VSSTRESN and VSSTRESC are not both missing
 # - 2)AE: use AESTDTC date
 # - 3)DS: use DSSTDTC date
 # - 4)ASDL: use TRTEDTM (already in ADSL as TRTEDT)
-# -FIND maximum 
-# 1) last valid VS date
-# 2) last AE onset date
-# 3) last DS date
-# 4) last treatment date (TRTEDT)
+# step2: FIND maximum 
+# - 1) last valid VS date
+# - 2) last AE onset date
+# - 3) last DS date
+# - 4) last treatment date (TRTEDT)
 # ----------------------
+#step1
 vs_ext <- vs %>%
   derive_vars_dt(
     dtc = VSDTC,
@@ -160,7 +180,7 @@ ds_ext <- ds %>%
     new_vars_prefix = "DSST"
   )
 
-
+# step2
 adsl <- adsl %>%
   derive_vars_extreme_event(
     by_vars = exprs(STUDYID, USUBJID),
@@ -248,6 +268,7 @@ table(adsl_final$AGEGR9, useNA = 'ifany')
 table(adsl_final$AGEGR9N, useNA = 'ifany')
 # 2   3 
 # 1 305 
+#SAME--> YEAH!
 
 adsl2 <- dm %>%
   select(-DOMAIN)
@@ -272,61 +293,77 @@ table(adsl2$AGEGR9, useNA = 'ifany')
 table(adsl2$AGEGR9N, useNA = 'ifany')
 # 2   3 
 # 1 305
+#SAME--> YEAH!
 
 #5.2 check if LSTAVLDT date is last date
 table(adsl$LSTAVLDT >= as.Date(adsl$TRTSDTM), useNA = "ifany")
 # TRUE <NA> 
 #   254   52 
 
-#double coding LSTAVLDT using dplyr 
-check_vs <- vs_ext %>%
-  filter(!is.na(VSDT) & !(is.na(VSSTRESN) & is.na(VSSTRESC))) %>%
-  arrange(USUBJID, VSDT, VSSEQ) %>%
-  group_by(USUBJID) %>%
-  slice_tail(n = 1) %>%
-  ungroup() %>%
-  select(USUBJID, LAST_VS_DT = VSDT, VSDTC, VSSEQ, VSSTRESN, VSSTRESC)
-
-check_ae <- ae_ext %>%
-  filter(!is.na(AESTDT)) %>%
-  arrange(USUBJID, AESTDT, AESEQ) %>%
-  group_by(USUBJID) %>%
-  slice_tail(n = 1) %>%
-  ungroup() %>%
-  select(USUBJID, LAST_AE_DT = AESTDT, AESTDTC, AESEQ)
-
-check_ds <- ds_ext %>%
-  filter(!is.na(DSSTDT)) %>%
-  arrange(USUBJID, DSSTDT, DSSEQ) %>%
-  group_by(USUBJID) %>%
-  slice_tail(n = 1) %>%
-  ungroup() %>%
-  select(USUBJID, LAST_DS_DT = DSSTDT, DSSTDTC, DSSEQ)
-
-check_trt <- adsl %>%
-  select(USUBJID, TRTEDTM, TRTEDT)
-
-check_lstavldt <- adsl %>%
-  select(USUBJID, LSTAVLDT) %>%
-  left_join(check_vs, by = "USUBJID") %>%
-  left_join(check_ae, by = "USUBJID") %>%
-  left_join(check_ds, by = "USUBJID") %>%
-  left_join(check_trt, by = "USUBJID") %>%
-  mutate(
-    EXPECTED_LSTAVLDT = pmax(LAST_VS_DT, LAST_AE_DT, LAST_DS_DT, TRTEDT, na.rm = TRUE)
-  )
-
-wrong<-check_lstavldt %>%
-  filter(LSTAVLDT != EXPECTED_LSTAVLDT | (is.na(LSTAVLDT) != is.na(EXPECTED_LSTAVLDT)))
-wrong
+#double-coding LSTAVLDT using dplyr 
+# check_vs <- vs_ext %>%
+#   filter(!is.na(VSDT) & !(is.na(VSSTRESN) & is.na(VSSTRESC))) %>%
+#   arrange(USUBJID, VSDT, VSSEQ) %>%
+#   group_by(USUBJID) %>%
+#   slice_tail(n = 1) %>%
+#   ungroup() %>%
+#   select(USUBJID, LAST_VS_DT = VSDT, VSDTC, VSSEQ, VSSTRESN, VSSTRESC)
+# 
+# check_ae <- ae_ext %>%
+#   filter(!is.na(AESTDT)) %>%
+#   arrange(USUBJID, AESTDT, AESEQ) %>%
+#   group_by(USUBJID) %>%
+#   slice_tail(n = 1) %>%
+#   ungroup() %>%
+#   select(USUBJID, LAST_AE_DT = AESTDT, AESTDTC, AESEQ)
+# 
+# check_ds <- ds_ext %>%
+#   filter(!is.na(DSSTDT)) %>%
+#   arrange(USUBJID, DSSTDT, DSSEQ) %>%
+#   group_by(USUBJID) %>%
+#   slice_tail(n = 1) %>%
+#   ungroup() %>%
+#   select(USUBJID, LAST_DS_DT = DSSTDT, DSSTDTC, DSSEQ)
+# 
+# check_trt <- adsl %>%
+#   select(USUBJID, TRTEDTM, TRTEDT)
+# 
+# check_lstavldt <- adsl %>%
+#   select(USUBJID, LSTAVLDT) %>%
+#   left_join(check_vs, by = "USUBJID") %>%
+#   left_join(check_ae, by = "USUBJID") %>%
+#   left_join(check_ds, by = "USUBJID") %>%
+#   left_join(check_trt, by = "USUBJID") %>%
+#   mutate(
+#     EXPECTED_LSTAVLDT = pmax(LAST_VS_DT, LAST_AE_DT, LAST_DS_DT, TRTEDT, na.rm = TRUE)
+#   )
+# 
+# wrong<-check_lstavldt %>%
+#   filter(LSTAVLDT != EXPECTED_LSTAVLDT | (is.na(LSTAVLDT) != is.na(EXPECTED_LSTAVLDT)))
+# wrong
 # 0 obs-->means correct 
+#SAME--> YEAH!
 
 # -----------------------------------------------------
 # 6. Save outputs
 # -----------------------------------------------------
 write.csv(
   adsl_final,
-  file = "adsl_final_20260418.csv",
+  file = "output/adsl_final_20260419.csv",
   row.names = FALSE,
   na = ""
 )
+
+cat("Output dataset saved to: output/adsl_final_20260419.csv\n")
+cat("Number of rows:", nrow(adsl_final), "\n")
+cat("Number of columns:", ncol(adsl_final), "\n")
+cat("Column names:\n")
+print(names(adsl_final))
+cat("Preview of dataset:\n")
+print(head(adsl_final))
+
+cat("Status: Completed successfully\n")
+cat("Run ended:", as.character(Sys.time()), "\n")
+
+# close log
+sink()
