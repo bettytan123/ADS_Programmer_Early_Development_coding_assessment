@@ -192,7 +192,7 @@ Outputs are saved for traceability.
 
 ---
 
-## Walkthrough
+## Walkthrough Video (2 Mins)
 
 A brief screen-share walkthrough is provided separately.
 
