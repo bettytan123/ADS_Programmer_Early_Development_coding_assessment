@@ -1,0 +1,103 @@
+#run streamlit app in local terminal 
+
+PS C:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment> cd Question4
+PS C:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment\Question4> python -m streamlit run app.py
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://172.20.10.2:8501
+
+Loading from: C:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment\Question4\data\adae.csv
+2026-04-19 23:09:21.726 Please replace `use_container_width` with `width`.
+
+#######################################################
+You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://172.20.10.2:8501
+######################################################
+
+
+#run test script in vscode
+PS C:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment> & "C:\Users\betty chen\AppData\Local\Python\pythoncore-3.14-64\python.exe" "c:/Users/betty chen/Documents/ADS_Programmer_Early_Development_coding_assessment/Question4/test_queries.py"
+Loading from: c:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment\Question4\data\adae.csv
+Loaded 1,191 AE records — 225 unique subjects
+Agent mode : MOCK (rule-based)
+
+========================================================================
+Query 1: Give me the subjects who had Adverse events of Moderate severity.
+{
+  "question": "Give me the subjects who had Adverse events of Moderate severity.",
+  "parsed": {
+    "target_column": "AESEV",
+    "filter_value": "MODERATE"
+  },
+  "matching_rows": 378,
+  "subject_count": 136,
+  "subjects": [
+    "01-701-1023",
+    "01-701-1047",
+    "01-701-1097",
+    "01-701-1111",
+    "01-701-1115",
+    "01-701-1133",
+    "01-701-1146",
+    "01-701-1148",
+    "01-701-1180",
+    "01-701-1181",
+    "... (+126 more)"
+  ],
+  "used_mock": true
+}
+========================================================================
+Query 2: Which patients experienced Cardiac disorders?
+{
+  "question": "Which patients experienced Cardiac disorders?",
+  "parsed": {
+    "target_column": "AESOC",
+    "filter_value": "CARDIAC"
+  },
+  "matching_rows": 91,
+  "subject_count": 44,
+  "subjects": [
+    "01-701-1023",
+    "01-701-1047",
+    "01-703-1175",
+    "01-703-1299",
+    "01-703-1335",
+    "01-704-1008",
+    "01-704-1017",
+    "01-704-1025",
+    "01-704-1065",
+    "01-704-1266",
+    "... (+34 more)"
+  ],
+  "used_mock": true
+}
+========================================================================
+Query 3: Find subjects with Headache.
+{
+  "question": "Find subjects with Headache.",
+  "parsed": {
+    "target_column": "AETERM",
+    "filter_value": "HEADACHE"
+  },
+  "matching_rows": 21,
+  "subject_count": 16,
+  "subjects": [
+    "01-701-1180",
+    "01-701-1302",
+    "01-701-1363",
+    "01-701-1383",
+    "01-704-1388",
+    "01-708-1019",
+    "01-708-1087",
+    "01-708-1272",
+    "01-708-1316",
+    "01-709-1217",
+    "... (+6 more)"
+  ],
+  "used_mock": true
+}
+PS C:\Users\betty chen\Documents\ADS_Programmer_Early_Development_coding_assessment>
