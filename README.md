@@ -10,6 +10,7 @@ The project is organized into four sections:
 4. **Question 4:** Generative AI-powered Clinical Trial Data Assistant
 
 ## Repository Structure
+```
 ADS_Programmer_Early_Development_coding_assessment/
 ├── Question1/
 │   ├── question_1_sdtm_01_create_ds_domain.R
@@ -49,7 +50,7 @@ ADS_Programmer_Early_Development_coding_assessment/
 └── ADS_Programmer_Early_Development_coding_assessment.Rproj
 └── .gitignore
 
-
+```
 
 
 ---
