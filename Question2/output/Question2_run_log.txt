@@ -1,0 +1,30 @@
+Run started: 2026-04-19 20:12:56.260447 
+Output dataset saved to: output/adsl_final_20260419.csv
+Number of rows: 306 
+Number of columns: 37 
+Column names:
+ [1] "STUDYID"  "USUBJID"  "SUBJID"   "RFSTDTC"  "RFENDTC"  "RFXSTDTC"
+ [7] "RFXENDTC" "RFICDTC"  "RFPENDTC" "DTHDTC"   "DTHFL"    "SITEID"  
+[13] "BRTHDTC"  "AGE"      "AGEGR9"   "AGEGR9N"  "AGEU"     "SEX"     
+[19] "RACE"     "ETHNIC"   "ARMCD"    "ARM"      "ITTFL"    "ACTARMCD"
+[25] "ACTARM"   "COUNTRY"  "DMDTC"    "DMDY"     "ARMNRS"   "ACTARMUD"
+[31] "TRTSDTM"  "TRTSTMF"  "TRTEDTM"  "TRTETMF"  "TRTSDT"   "TRTEDT"  
+[37] "LSTAVLDT"
+Preview of dataset:
+# A tibble: 6 × 37
+  STUDYID     USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC RFICDTC RFPENDTC
+  <chr>       <chr>   <chr>  <chr>   <chr>   <chr>    <chr>    <chr>   <chr>   
+1 CDISCPILOT… 01-701… 1015   2014-0… 2014-0… 2014-01… 2014-07… <NA>    2014-07…
+2 CDISCPILOT… 01-701… 1023   2012-0… 2012-0… 2012-08… 2012-09… <NA>    2013-02…
+3 CDISCPILOT… 01-701… 1028   2013-0… 2014-0… 2013-07… 2014-01… <NA>    2014-01…
+4 CDISCPILOT… 01-701… 1033   2014-0… 2014-0… 2014-03… 2014-03… <NA>    2014-09…
+5 CDISCPILOT… 01-701… 1034   2014-0… 2014-1… 2014-07… 2014-12… <NA>    2014-12…
+6 CDISCPILOT… 01-701… 1047   2013-0… 2013-0… 2013-02… 2013-03… <NA>    2013-07…
+# ℹ 28 more variables: DTHDTC <chr>, DTHFL <chr>, SITEID <chr>, BRTHDTC <chr>,
+#   AGE <dbl>, AGEGR9 <chr>, AGEGR9N <dbl>, AGEU <chr>, SEX <chr>, RACE <chr>,
+#   ETHNIC <chr>, ARMCD <chr>, ARM <chr>, ITTFL <chr>, ACTARMCD <chr>,
+#   ACTARM <chr>, COUNTRY <chr>, DMDTC <chr>, DMDY <dbl>, ARMNRS <chr>,
+#   ACTARMUD <chr>, TRTSDTM <dttm>, TRTSTMF <chr>, TRTEDTM <dttm>,
+#   TRTETMF <chr>, TRTSDT <date>, TRTEDT <date>, LSTAVLDT <date>
+Status: Completed successfully
+Run ended: 2026-04-19 20:12:57.521238 
