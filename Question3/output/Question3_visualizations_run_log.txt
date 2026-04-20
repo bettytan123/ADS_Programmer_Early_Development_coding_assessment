@@ -1,0 +1,5 @@
+Run started: 2026-04-19 21:33:20.976839 
+AE table saved to: output/AE_Severity_Distribution_by_Treatment_20260419.png
+    and output/Top10_Most_Frequent_AEs_20260419.png
+AE severity plot saved successfully
+Run ended: 2026-04-19 21:33:21.488817 

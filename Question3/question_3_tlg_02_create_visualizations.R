@@ -9,9 +9,26 @@
 # plot 1: AE severity distribution by treatment (bar chart or heatmap). 
 # AE Severity is captured in the AESEV variable in pharmaverseadam::adae dataset
 
+setwd("C:/Users/betty chen/Documents/ADS_Programmer_Early_Development_coding_assessment/Question3")
+#------------------
+# Prepare to save log later
+#------------------
+# create output folder if it does not exist
+if (!dir.exists("output")) {
+  dir.create("output")
+}
+
+# close any existing sinks
+while (sink.number() > 0) sink()
+
+# start log
+sink("output/Question3_visualizations_run_log.txt", split = TRUE)
+
+cat("Run started:", as.character(Sys.time()), "\n")
+
 
 #--------------------------------------------------
-# 1.load library and input data (1.1-1.2)
+# 1.load library and input data (1 file)
 #--------------------------------------------------
 library(dplyr)
 library(ggplot2)
@@ -23,9 +40,9 @@ adae <- pharmaverseadam::adae
 
 
 #--------------------------------------------------
-# 2.Prepare plot data (2.1)
+# 2.Prepare plot data 
 #-------------------------------------------------
-#2.1 
+#create plot ready pdf 
 plot_df <- adae %>%
   filter(!is.na(TRT01A), !is.na(AESEV)) %>%
   group_by(TRT01A, AESEV) %>%
@@ -52,7 +69,7 @@ p_stackbar
 # 4. Save outputs: PNG
 # -----------------------------------------------------
 ggsave(
-  filename = "AE_Severity_Distribution_by_Treatment_20260418.png",
+  filename = "output/AE_Severity_Distribution_by_Treatment_20260419.png",
   plot = p_stackbar,
   width = 8,
   height = 6,
@@ -96,14 +113,14 @@ ae_top10 <- adae %>%
     pct = n / n_subj
   )
 
-# 2.3 Clopper-Pearson 95% CI
+# 2.3 create Clopper-Pearson 95% CI
 ci <- binom.confint(
   x = ae_top10$n,
   n = n_subj,
   methods = "exact"
 )
 
-#2.4merge for final number
+#2.4merge for final number for plot
 plot_ae_top10 <- ae_top10 %>%
   mutate(
     lower = ci$lower,
@@ -146,9 +163,19 @@ p_ae
 # 4. Save outputs: PNG
 # -----------------------------------------------------
 ggsave(
-  filename = "Top10_Most_Frequent_AEs_20260418.png",
-  plot = p,
+  filename = "output/Top10_Most_Frequent_AEs_20260419.png",
+  plot = p_ae,
   width = 8,
   height = 5.5,
   dpi = 300
 )
+
+cat("AE table saved to: output/AE_Severity_Distribution_by_Treatment_20260419.png
+    and output/Top10_Most_Frequent_AEs_20260419.png\n")
+cat("AE severity plot saved successfully\n")
+
+
+cat("Run ended:", as.character(Sys.time()), "\n")
+
+# close log
+sink()

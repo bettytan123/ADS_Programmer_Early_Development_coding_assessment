@@ -11,3 +11,4 @@ Pharmaverse
 Part2) Questions 4 [Bonus]: Python question
 
 Here is the link for a brief screen-share walkthrough of my repository : 
+HTML file should be opened in a browser for proper viewing
