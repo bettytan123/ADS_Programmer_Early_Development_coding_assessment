@@ -13,40 +13,40 @@ The project is organized into four sections:
 ```
 ADS_Programmer_Early_Development_coding_assessment/
 ├── Question1/
-│   ├── question_1_sdtm_01_create_ds_domain.R
-│   ├── sdtm_ct.csv
+│   ├── question_1_sdtm_01_create_ds_domain.R         #Main script
+│   ├── sdtm_ct.csv                                   #CT table
 │   └── output/
-│       ├── ds_final_20260419.csv
-│       └── Question1_run_log.txt
+│       ├── ds_final_20260419.csv                     #Output final data
+│       └── Question1_run_log.txt                     #Output logs
 │
 ├── Question2/
-│   ├── question_2_adam_create_adsl.R
+│   ├── question_2_adam_create_adsl.R                 #Main script
 │   └── output/
-│       ├── adsl_final_20260419.csv
-│       └── Question2_run_log.txt
+│       ├── adsl_final_20260419.csv                   #Output final data
+│       └── Question2_run_log.txt                     #Output logs
 │
 ├── Question3/
-│   ├── question_3_tlg_01_create_ae_summary_table.R
-│   ├── question_3_tlg_02_create_visualizations.R
+│   ├── question_3_tlg_01_create_ae_summary_table.R   #Main script
+│   ├── question_3_tlg_02_create_visualizations.R     #Main script
 │   └── output/
-│       ├── Treatment_Emergent_AEs_table.html
-│       ├── AE_Severity_Distribution_by_Treatment_20260419.png
-│       ├── Top10_Most_Frequent_AEs_20260419.png
-│       ├── Question3_aesummary_run_log.txt
-│       └── Question3_visualizations_run_log.txt
+│       ├── Treatment_Emergent_AEs_table.html         #Output html
+│       ├── AE_Severity_Distribution_by_Treatment_20260419.png  #Output plot
+│       ├── Top10_Most_Frequent_AEs_20260419.png      #Output plot
+│       ├── Question3_aesummary_run_log.txt           #Output logs
+│       └── Question3_visualizations_run_log.txt      #Output logs
 │
 ├── Question4/
-│   ├── app.py                                 # Streamlit UI
-│   ├── clinical_trial_agent.py                # Core agent logic (LLM + execution)
-│   ├── test_queries.py                        # Test script
+│   ├── app.py                                        #Streamlit UI
+│   ├── clinical_trial_agent.py                       #Core agent logic (LLM + execution)
+│   ├── test_queries.py                               #Test script
 │   ├── data/
-│   │   └── adae.csv                           # Input adae dataset
-│   │   └── create_adae.R
+│   │   └── adae.csv                                  #Input adae dataset
+│   │   └── create_adae.R                             #Script create adae
 │   │
 │   └── output/
-│       └── output_testscript.txt              # Example output logs
+│       └── output_testscript.txt                     #Example output logs
 │
-├── README.md
+├── README.md                                         #FIRST THING
 └── ADS_Programmer_Early_Development_coding_assessment.Rproj
 └── .gitignore
 
