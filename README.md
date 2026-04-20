@@ -196,7 +196,7 @@ Outputs are saved for traceability.
 
 A brief screen-share walkthrough is provided separately.
 
-**Link:** *(soon link here)*
+**Link:** *(https://www.youtube.com/watch?v=3PKK3ZaQ1Zo)*
 
 
 
